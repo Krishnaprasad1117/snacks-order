@@ -1,0 +1,189 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Snacks Ordering System</title>
+    <style>
+        /* General Styles */
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: #f9f9f9;
+        }
+        .container {
+            width: 90%;
+            max-width: 800px;
+            margin: 20px auto;
+            padding: 20px;
+            background: white;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+            border-radius: 8px;
+        }
+        h1, h3 {
+            text-align: center;
+            color: #333;
+        }
+        form {
+            display: flex;
+            flex-direction: column;
+        }
+        label {
+            margin-top: 10px;
+            font-weight: bold;
+        }
+        input, textarea, button {
+            margin-top: 5px;
+            padding: 8px;
+            font-size: 1rem;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+        }
+        button {
+            margin-top: 20px;
+            padding: 10px;
+            background-color: #28a745;
+            color: white;
+            font-size: 1rem;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+        button:hover {
+            background-color: #218838;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
+        }
+        table, th, td {
+            border: 1px solid #ddd;
+        }
+        th, td {
+            padding: 10px;
+            text-align: left;
+        }
+        th {
+            background-color: #f8f8f8;
+        }
+        .actions button {
+            background-color: #dc3545;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            padding: 5px 10px;
+            cursor: pointer;
+        }
+        .actions button:hover {
+            background-color: #c82333;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Order Snacks</h1>
+        <form id="orderForm">
+            <label for="name">Name</label>
+            <input type="text" id="name" required>
+
+            <label for="phone">Phone</label>
+            <input type="tel" id="phone" required>
+
+            <label for="address">Address</label>
+            <textarea id="address" rows="3" required></textarea>
+
+            <h3>Select Snacks:</h3>
+            <label><input type="checkbox" value="Chips"> Chips ($2.50)</label><br>
+            <label><input type="checkbox" value="Cookies"> Cookies ($3.50)</label><br>
+            <label><input type="checkbox" value="Soda"> Soda ($1.50)</label><br>
+
+            <button type="submit">Place Order</button>
+        </form>
+    </div>
+
+    <div class="container">
+        <h1>Owner Dashboard</h1>
+        <table>
+            <thead>
+                <tr>
+                    <th>ID</th>
+                    <th>Name</th>
+                    <th>Phone</th>
+                    <th>Address</th>
+                    <th>Snacks</th>
+                    <th>Total</th>
+                    <th>Actions</th>
+                </tr>
+            </thead>
+            <tbody id="orderTableBody"></tbody>
+        </table>
+    </div>
+
+    <script>
+        // Handle order submission
+        document.getElementById('orderForm').addEventListener('submit', function (event) {
+            event.preventDefault();
+
+            const name = document.getElementById('name').value;
+            const phone = document.getElementById('phone').value;
+            const address = document.getElementById('address').value;
+            const snacks = Array.from(document.querySelectorAll('input[type="checkbox"]:checked')).map(item => item.value);
+            const total = snacks.length * 2.5; // Example calculation: $2.50 per snack
+
+            const order = {
+                id: Date.now(),
+                name,
+                phone,
+                address,
+                snacks: snacks.join(', '),
+                total: `$${total.toFixed(2)}`
+            };
+
+            // Save to LocalStorage
+            const orders = JSON.parse(localStorage.getItem('orders') || '[]');
+            orders.push(order);
+            localStorage.setItem('orders', JSON.stringify(orders));
+
+            alert('Order placed successfully!');
+            renderOrders(); // Refresh owner dashboard
+        });
+
+        // Render orders in the owner dashboard
+        function renderOrders() {
+            const orderTableBody = document.getElementById('orderTableBody');
+            const orders = JSON.parse(localStorage.getItem('orders') || '[]');
+
+            orderTableBody.innerHTML = ''; // Clear previous rows
+            orders.forEach(order => {
+                const row = document.createElement('tr');
+                row.innerHTML = `
+                    <td>${order.id}</td>
+                    <td>${order.name}</td>
+                    <td>${order.phone}</td>
+                    <td>${order.address}</td>
+                    <td>${order.snacks}</td>
+                    <td>${order.total}</td>
+                    <td class="actions">
+                        <button onclick="deleteOrder(${order.id})">Delete</button>
+                    </td>
+                `;
+                orderTableBody.appendChild(row);
+            });
+        }
+
+        // Delete an order
+        function deleteOrder(orderId) {
+            let orders = JSON.parse(localStorage.getItem('orders') || '[]');
+            orders = orders.filter(order => order.id !== orderId);
+            localStorage.setItem('orders', JSON.stringify(orders));
+            renderOrders();
+            alert('Order deleted successfully!');
+        }
+
+        // Initialize dashboard on load
+        document.addEventListener('DOMContentLoaded', renderOrders);
+    </script>
+</body>
+</html>
