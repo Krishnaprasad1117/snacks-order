@@ -1,0 +1,112 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Snacks Order - Customer</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f9f9f9;
+            padding: 20px;
+        }
+        .container {
+            max-width: 600px;
+            margin: auto;
+            padding: 20px;
+            background: white;
+            border-radius: 8px;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+        }
+        h1 {
+            text-align: center;
+        }
+        form label, form input, form textarea, form button {
+            display: block;
+            width: 100%;
+            margin-bottom: 10px;
+        }
+        button {
+            background-color: #28a745;
+            color: white;
+            border: none;
+            padding: 10px;
+            cursor: pointer;
+            border-radius: 5px;
+        }
+        button:hover {
+            background-color: #218838;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Place Your Order</h1>
+        <form id="orderForm">
+            <label for="name">Name</label>
+            <input type="text" id="name" required>
+            <label for="phone">Phone</label>
+            <input type="tel" id="phone" required>
+            <label for="address">Address</label>
+            <input type="text" id="address" required>
+
+            <h3>Snacks</h3>
+            <label for="chogodi">Chogodi (₹50 per pack)</label>
+            <input type="number" id="chogodi" placeholder="Enter quantity (e.g., 2 packs)" min="0">
+
+            <label for="gavalu">Gavalu (₹40 per pack)</label>
+            <input type="number" id="gavalu" placeholder="Enter quantity (e.g., 3 packs)" min="0">
+
+            <h3>Additional Items</h3>
+            <label for="extraItem">What extra item do you need?</label>
+            <input type="text" id="extraItem" placeholder="Enter item name (e.g., Laddu)">
+            <label for="extraQuantity">How many of these do you need?</label>
+            <input type="number" id="extraQuantity" placeholder="Enter quantity" min="0">
+
+            <button type="submit">Place Order</button>
+        </form>
+    </div>
+
+    <script>
+        document.getElementById('orderForm').addEventListener('submit', function (e) {
+            e.preventDefault();
+
+            // Get customer details
+            const name = document.getElementById('name').value;
+            const phone = document.getElementById('phone').value;
+            const address = document.getElementById('address').value;
+
+            // Get snack quantities
+            const chogodiQty = parseInt(document.getElementById('chogodi').value || 0, 10);
+            const gavaluQty = parseInt(document.getElementById('gavalu').value || 0, 10);
+
+            // Calculate snack costs
+            const chogodiCost = chogodiQty * 50; // ₹50 per pack
+            const gavaluCost = gavaluQty * 40;   // ₹40 per pack
+
+            // Get additional items
+            const extraItem = document.getElementById('extraItem').value || "None";
+            const extraQty = parseInt(document.getElementById('extraQuantity').value || 0, 10);
+
+            // Total cost
+            const total = chogodiCost + gavaluCost;
+
+            const order = {
+                id: Date.now(),
+                name,
+                phone,
+                address,
+                items: `Chogodi: ${chogodiQty} packs, Gavalu: ${gavaluQty} packs, Extra Item: ${extraItem} (${extraQty})`,
+                total: `₹${total.toFixed(2)}`
+            };
+
+            // Save order to LocalStorage
+            const orders = JSON.parse(localStorage.getItem('orders') || '[]');
+            orders.push(order);
+            localStorage.setItem('orders', JSON.stringify(orders));
+
+            alert('Order placed successfully!');
+        });
+    </script>
+</body>
+</html>
